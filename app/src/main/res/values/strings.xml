@@ -1,0 +1,9 @@
+<resources>
+    <string name="app_name">ProyectoGestor</string>
+
+    <string name="hello_world">Hello world!</string>
+    <string name="action_settings">Settings</string>
+
+    <string name="carpetaRaiz">Carpeta raíz</string>
+    <string name="v2">Estamos trabajando en la version 2</string>
+</resources>

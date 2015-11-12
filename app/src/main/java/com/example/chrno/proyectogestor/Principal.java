@@ -48,55 +48,56 @@ public class Principal extends Activity {
 //        return super.onOptionsItemSelected(item);
 //    }
     public void init(){
-        String ruta="";
+        String ruta=""; //ruta en la que estamos
         lv=(ListView)findViewById(R.id.lv);
         ImageView iv=(ImageView)findViewById(R.id.imageView2);
         Intent i=getIntent();
         Bundle b=i.getExtras();
             if(b==null)
                 ruta="/";
-            else ruta=b.getString("ruta");
+            else ruta=b.getString("ruta"); // si bundle no esta vacio es que pasamos una ruta
             if(ruta.equals("/"))
-                iv.setVisibility(View.GONE);
+                iv.setVisibility(View.GONE);//si la ruta es / pongo en invisible el boton de atras
             else iv.setVisibility(View.VISIBLE);
 
         TextView tv=(TextView)findViewById(R.id.ruta);
-        tv.setText(ruta);
-        generaAdaptador(ruta);
+        tv.setText(ruta);//pongo la ruta en el text view
+        generaAdaptador(ruta);//genero el adaptador pasandole la ruta del fichero que debe abrir
     }
 
     public void generaAdaptador(String ruta){
-        aux=getArchivos(ruta);
+        aux=getArchivos(ruta);//recogo el array de archivos que hay en la ruta que le pasamos
         ad=new Adaptador(this,R.layout.elemento_lista, aux);
         lv.setAdapter(ad);
         lv.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View v, int posicion, long id) {
                 File f=aux.get(posicion);
-                if(f.isDirectory()){
+                if(f.isDirectory()){// si es un directorio pongo su ruta en el bundle y empiezo otra actividad
                 String s=f.getAbsolutePath();
                     Intent i=new Intent(Principal.this,Principal.class);
                     Bundle b=new Bundle();
                     b.putString("ruta",s);
                     i.putExtras(b);
                     startActivity(i);
-                }else
+                }else // si no en la proxima practica abriremos el fichero
                     Toast.makeText(v.getContext(),R.string.v2,Toast.LENGTH_SHORT).show();
             }
         });
         registerForContextMenu(lv);
     }
-    private static List<File> getArchivos(String ruta){
+    private static List<File> getArchivos(String ruta){//metodo que devuelve el array de archivos
         File f=new File(ruta);
         File lista[]=f.listFiles();
             List<File> al=new ArrayList<>();
-        if(lista!=null){
+        if(lista!=null){// si la lista esta vacia es que dentro del archivo no hay nada que mostrar
             for(File fichero:lista)
                 al.add(fichero);
-            Collections.sort(al, OrdenarArchivo.getComparador());
+            Collections.sort(al, OrdenarArchivo.getComparador());//ordeno los archivos (directorios primero)
         }
         return al;
     }
+    // BOTONES
     public void atras(View v){
         this.finish();
     }

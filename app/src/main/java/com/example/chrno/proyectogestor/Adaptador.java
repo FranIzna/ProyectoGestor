@@ -48,36 +48,37 @@ public class Adaptador  extends ArrayAdapter<File> {
             convertView.setTag(gv);
         }else gv=(GuardaLista) convertView.getTag();
 
-        f=archivos.get(position);
-        if(f.isFile())
+        f=archivos.get(position);// recojo el archivo
+        if(f.isFile()) // si es un archivo le pongo una imagen
             gv.iv.setImageResource(R.drawable.arc);
-        else if(f.isDirectory())
+        else if(f.isDirectory())// si es una carpeta le pongo otra imagen
             gv.iv.setImageResource(R.drawable.fic);
 
         String nombre=f.getName();
-        if(nombre.length()>20)
+        if(nombre.length()>20)//si el tamaño se pasa de 20 le pongo puntos suspensivos despues del caracter 18
             nombre=nombre.substring(0,18)+"...";
         gv.tv1.setText(nombre);
 
         Date d=new Date();
         d.setTime(f.lastModified());
-        String fecha=(d.getDay()+1)+"/"+(d.getMonth()+1)+"/"+(d.getYear()+1900);
+        String fecha=(d.getDay()+1)+"/"+(d.getMonth()+1)+"/"+(d.getYear()+1900);//formateo la fecha
         gv.tv2.setText(""+fecha);
 
         String s="";
-        if(f.canRead())
+        if(f.canRead()) // permiso leer
             s+="r ";
         if(f.canWrite())
             s+="w ";
         if(f.canExecute())
             s+="x ";
-        if(!f.isDirectory() ){
+        gv.tv3.setText(s);//seteo los permisos
+
+        if(!f.isDirectory() ){// si no es un directorio le pongo en visible el tamaño en kb
             gv.tv4.setVisibility(View.VISIBLE);
             long tam=f.length()/1024;
             if(tam!=0)
                 gv.tv4.setText(tam+"kB");
         }
-        gv.tv3.setText(s);
         return convertView;
     }
 

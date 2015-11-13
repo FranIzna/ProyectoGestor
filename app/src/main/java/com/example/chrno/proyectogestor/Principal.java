@@ -2,18 +2,29 @@ package com.example.chrno.proyectogestor;
 
 import android.app.Activity;
 import android.content.Intent;
+import android.content.res.AssetManager;
+import android.os.Environment;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.inputmethod.InputMethodSubtype;
 import android.widget.AdapterView;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import java.io.BufferedReader;
+import java.io.ByteArrayOutputStream;
 import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -57,7 +68,7 @@ public class Principal extends Activity {
                 ruta="/";
             else ruta=b.getString("ruta"); // si bundle no esta vacio es que pasamos una ruta
             if(ruta.equals("/"))
-                iv.setVisibility(View.GONE);//si la ruta es / pongo en invisible el boton de atras
+                iv.setVisibility(View.GONE);//si la ruta es '/' pongo en invisible el boton de atras
             else iv.setVisibility(View.VISIBLE);
 
         TextView tv=(TextView)findViewById(R.id.ruta);
@@ -65,8 +76,8 @@ public class Principal extends Activity {
         generaAdaptador(ruta);//genero el adaptador pasandole la ruta del fichero que debe abrir
     }
 
-    public void generaAdaptador(String ruta){
-        aux=getArchivos(ruta);//recogo el array de archivos que hay en la ruta que le pasamos
+    public void generaAdaptador(final String ruta){
+        aux=getArchivos(ruta);//recojo el array de archivos que hay en la ruta que le pasamos
         ad=new Adaptador(this,R.layout.elemento_lista, aux);
         lv.setAdapter(ad);
         lv.setOnItemClickListener(new AdapterView.OnItemClickListener() {
@@ -80,11 +91,37 @@ public class Principal extends Activity {
                     b.putString("ruta",s);
                     i.putExtras(b);
                     startActivity(i);
-                }else // si no en la proxima practica abriremos el fichero
-                    Toast.makeText(v.getContext(),R.string.v2,Toast.LENGTH_SHORT).show();
+                }else{ // si no abriremos el fichero
+//                    Toast.makeText(v.getContext(),R.string.v2,Toast.LENGTH_SHORT).show();
+                    if(f.canExecute()){//si se puede ejecutar
+                        List<String> fichero=new ArrayList<>();
+                        String fic=lectura(f.getAbsolutePath());
+                            fichero.add(""+fic);
+                        AdaptadorFichero af=
+                                new AdaptadorFichero(Principal.this,R.layout.elemento_lista,fichero);
+                        lv.setAdapter(af);
+                        TextView tv=(TextView)findViewById(R.id.ruta);
+                        tv.setText(f.getAbsolutePath());//pongo la ruta en el text view
+                    }
+                }
             }
         });
         registerForContextMenu(lv);
+    }
+    public String lectura(String ruta){
+        String s ="";
+        try {
+            File file = new File(ruta);
+            BufferedReader br = new BufferedReader(new FileReader(file));
+            String line;
+            while ((line = br.readLine()) != null) {
+                s+=(line);
+                Log.i("Test", "text : "+s+" : end");
+                s+=('\n');
+            } }
+        catch (IOException e) {}
+
+        return s;
     }
     private static List<File> getArchivos(String ruta){//metodo que devuelve el array de archivos
         File f=new File(ruta);
